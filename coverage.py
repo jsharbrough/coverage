@@ -9,15 +9,16 @@ def indexVCF(vcfFile):
             info = lineSplit[7]
             infoSplit = info.split(';')
             dp = infoSplit[0]
-            depth = int(dp[3:])
-            currScaffold = lineSplit[0]
-            pos = int(lineSplit[1])
-            if currScaffold in depthDict:
-                scaffDict = depthDict[currScaffold]
-                scaffDict[pos] = depth
-            else:
-                scaffDict = {pos:depth}
-            depthDict[currScaffold] = scaffDict             
+            if dp[0:3] == 'DP=':
+                depth = int(dp[3:])
+                currScaffold = lineSplit[0]
+                pos = int(lineSplit[1])
+                if currScaffold in depthDict:
+                    scaffDict = depthDict[currScaffold]
+                    scaffDict[pos] = depth
+                else:
+                    scaffDict = {pos:depth}
+                depthDict[currScaffold] = scaffDict             
     with open(vcfFile + '.pickle','wb') as f:
         pickle.dump(depthDict,f)
 
