@@ -25,13 +25,15 @@ USAGE
 	python coverage.py -i <vcfFile> <options> > coverage.txt
 
 OPTIONS
-	-i	<vcf file>		Input File [REQUIRED]. If no input file is given, the program will output the 
-						help menu. File should be in VCF format for a single individual per file.
+	-i	<vcf file>	Input File [REQUIRED]. If no input file is given, the program will output the 
+				help menu. File should be in VCF format for a single individual per file.
+	
 	-r	<regions file>	Regions file. Tab-delimited file containing the region name, the scaffold 
-						name, the start, and stop position for each region. One region per line. 
-						samPositions.py can be used to generate this file or it can be manually 
-						generated.
-	-d	<int>			Max Depth. Sites with coverage greater than d will be ignored.
+				name, the start, and stop position for each region. One region per line. 
+				samPositions.py can be used to generate this file or it can be manually 
+				generated.
+	
+	-d	<int>		Max Depth. Sites with coverage greater than d will be ignored.
 	
 
 Questions and comments should be addressed to Joel Sharbrough at jsharbro[at]gmail.com.
