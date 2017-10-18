@@ -75,7 +75,7 @@ def coverage(vcfFile,regionsFile=False):
                 median = float(depths[len(depths)/2] + depths[len(depths)/2 - 1])/2.0
             else:
                 median = depths[len(depths)/2]
-            sys.stdout.write(str(meanDepth) + '\t' + median + '\n')
+            sys.stdout.write(str(meanDepth) + '\t' + str(median) + '\n')
     else:
         sys.stdout.write('Mean Depth\tMedian Depth\n')
         depths = []
