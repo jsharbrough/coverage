@@ -22,7 +22,7 @@ def indexVCF(vcfFile):
     with open(vcfFile + '.pickle','wb') as f:
         pickle.dump(depthDict,f)
 
-def coverage(vcfFile,regionsFile=False):
+def coverage(vcfFile,regionsFile=False, maxDepth=False):
     try:
         indexFile = open(vcfFile + '.pickle', 'rb')
     except IOError:
@@ -49,11 +49,16 @@ def coverage(vcfFile,regionsFile=False):
                 totalDepth = 0
                 while i < stop:
                     posDepth = scaffDepths[i]
-                    totalDepth += posDepth
-                    depths.append(posDepth)
+                    if maxDepth != False:
+                        if posDepth < maxDepth:
+                            totalDepth += posDepth
+                            depths.append(posDepth)
+                    else:
+                        totalDepth += posDepth
+                        depths.append(posDepth)
                     i += 1
                 depths.sort()
-                meanDepth = totalDepth/(float(stop - start))
+                meanDepth = totalDepth/(float(len(depths)))
                 if len(depths)%2 == 0:
                     median = float(depths[len(depths)/2] + depths[len(depths)/2 - 1])/2.0
                 else:
@@ -66,9 +71,14 @@ def coverage(vcfFile,regionsFile=False):
             for scaffold in depthDict:
                 scaffDict = depthDict[scaffold]
                 for pos in scaffDict:
-                    depth = scaffDict[pos]
-                    depths.append(depth)
-                    totalDepth += depth
+                    posDepth = scaffDict[pos]
+                    if maxDepth != False:
+                        if posDepth < maxDepth:
+                            totalDepth += posDepth
+                            depths.append(posDepth)
+                    else:
+                        totalDepth += posDepth
+                        depths.append(posDepth)
             depths.sort()
             meanDepth = totalDepth/(float(len(depths)))
             if len(depths)%2 == 0:
@@ -83,9 +93,14 @@ def coverage(vcfFile,regionsFile=False):
         for scaffold in depthDict:
             scaffDict = depthDict[scaffold]
             for pos in scaffDict:
-                depth = scaffDict[pos]
-                depths.append(depth)
-                totalDepth += depth
+                posDepth = scaffDict[pos]
+                if maxDepth != False:
+                    if posDepth < maxDepth:
+                        totalDepth += posDepth
+                        depths.append(posDepth)
+                else:
+                    totalDepth += posDepth
+                    depths.append(posDepth)
         depths.sort()
         meanDepth = totalDepth/(float(len(depths)))
         if len(depths)%2 == 0:
@@ -96,12 +111,30 @@ def coverage(vcfFile,regionsFile=False):
 
 
 def help():
-    helpStatement = 'USAGE\n\n\tpython coverage.py foo.vcf regions.txt > coverage.txt\n'
-    sys.stdout.write(helpStatement)
+    helpStatement = '\nUSAGE\n\n\tpython coverage.py -i <vcfFile> <options> > coverage.txt\n\nOPTIONS\n\t-i\t<vcf file>\tInput File [REQUIRED]. If no input file is given, the program will output the \n\t\t\t\thelp menu. File should be in VCF format for a single individual per file.\n\t-r\t<regions file>\tRegions file. Tab-delimited file containing the region name, the scaffold \n\t\t\t\tname, the start, and stop position for each region. One region per line. \n\t\t\t\tsamPositions.py can be used to generate this file or it can be manually \n\t\t\t\tgenerated.\n\t-d\t<int>\t\tMax Depth. Sites with coverage greater than d will be ignored.\n\n'
+    sys.stderr.write(helpStatement)
 
-if len(sys.argv) == 3:
-    coverage(sys.argv[1],sys.argv[2])
-elif len(sys.argv) == 2:
-    coverage(sys.argv[1])
+sys.stdout.write(str(sys.argv))
+optionDict = {}
+i = 1
+while i < (len(sys.argv)-1):
+    if sys.argv[i] == '-i':
+        optionDict['vcfFile'] = sys.argv[i+1]
+    elif sys.argv[i] == '-r':
+        optionDict['regionsFile'] = sys.argv[i+1]
+    elif sys.argv[i] == '-d':
+        optionDict['maxDepth'] = int(sys.argv[i+1])
+    i += 1
+
+if len(optionDict) > 0 and 'vcfFile' in optionDict:
+    if 'regionsFile' in optionDict:
+        if 'maxDepth' in optionDict:
+            coverage(optionDict['vcfFile'],optionDict['regionsFile'],optionDict['maxDepth'])
+        else:
+            coverage(optionDict['vcfFile'],optionDict['regionsFile'])
+    elif 'maxDepth' in optionDict:
+        coverage(optionDict['vcfFile'],False,optionDict['maxDepth'])
+    else:
+        coverage(optionDict['vcfFile'])
 else:
     help()
